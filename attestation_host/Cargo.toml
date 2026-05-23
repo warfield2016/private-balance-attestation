@@ -1,0 +1,22 @@
+[package]
+name = "attestation_host"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "LP-0005 host-side proof generation. Wraps the RISC0 prover and returns serialized receipt + decoded journal."
+
+[dependencies]
+risc0-zkvm = { workspace = true, default-features = false, features = ["std"] }
+attestation_core = { workspace = true }
+borsh = { workspace = true, default-features = false, features = ["derive", "std"] }
+serde = { workspace = true, default-features = false, features = ["derive", "std"] }
+bincode = { workspace = true }
+thiserror = { workspace = true }
+ed25519-dalek = { workspace = true, default-features = false, features = ["std", "rand_core"] }
+rand_core = { workspace = true, default-features = false, features = ["std"] }
+hex = { workspace = true, default-features = false, features = ["std"] }
+sha2 = { workspace = true, default-features = false, features = ["std"] }
+
+# Pulls in the ATTESTATION_GUEST_ELF + ID constants emitted by methods/build.rs.
+attestation_methods = { path = "../methods" }

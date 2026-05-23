@@ -1,0 +1,13 @@
+[package]
+name = "attestation_methods"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[build-dependencies]
+risc0-build = { workspace = true }
+
+# risc0-build reads this. "guest" is the path (relative to this file) of
+# the sub-package compiled with the riscv32im-risc0-zkvm-elf target.
+[package.metadata.risc0]
+methods = ["guest"]

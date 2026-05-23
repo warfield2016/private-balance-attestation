@@ -1,0 +1,7 @@
+{
+  "name": "@lp-0005/example-governance-gate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "On-chain governance gate example for LP-0005.",
+  "license": "(MIT OR Apache-2.0)"
+}

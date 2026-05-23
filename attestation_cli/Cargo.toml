@@ -1,0 +1,28 @@
+[package]
+name = "attestation_cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "LP-0005 CLI: prove, verify, inspect, sign, submit, context-id, fetch."
+
+[[bin]]
+name = "attestation-cli"
+path = "src/main.rs"
+
+[dependencies]
+attestation_core = { workspace = true }
+attestation_host = { workspace = true }
+attestation_verifier = { workspace = true }
+attestation_program = { workspace = true }
+clap = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true, features = ["std"] }
+serde_json = { workspace = true }
+borsh = { workspace = true, features = ["std"] }
+bincode = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+ed25519-dalek = { workspace = true, features = ["std", "rand_core"] }
+hex = { workspace = true, features = ["std"] }
+sha2 = { workspace = true, features = ["std"] }

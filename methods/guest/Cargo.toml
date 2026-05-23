@@ -1,0 +1,27 @@
+[package]
+name = "attestation_guest"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[[bin]]
+name = "attestation"
+path = "src/bin/attestation.rs"
+
+# Note: a previous version of this file declared a second binary,
+# `generate_idl`, which compiled `spel_framework::generate_idl!()` for
+# the riscv32im target. SPEL is a host-only proc-macro framework and
+# can't run inside the guest. IDL generation now lives in the host
+# `idl-gen` crate.
+
+[dependencies]
+# Shared, no_std core. The guest needs `compute_commitment`,
+# `verify_merkle_path`, `JournalFields`, `GuestWitness`. No std features —
+# the guest's libstd port handles `String`/`Vec` via `alloc`.
+attestation_core = { path = "../../attestation_core", default-features = false }
+
+# Guest-side RISC0. `std` is provided by the zkVM's guest libstd port.
+risc0-zkvm = { version = "=3.0.5", default-features = false, features = ["std"] }
+
+serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
+borsh = { version = "1.5", default-features = false, features = ["derive"] }

@@ -1,0 +1,20 @@
+{
+  "name": "@lp-0005/example-fee-tier-gate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Off-chain fee-tier gate scaffold — slot for the external-party integration.",
+  "license": "(MIT OR Apache-2.0)",
+  "type": "module",
+  "scripts": {
+    "demo": "node --import tsx ./src/cli.ts --proof ./fixtures/sample.proof --tier-table ./fixtures/tiers.json --challenge ./fixtures/challenge.bin --signature ./fixtures/signature.bin",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lp-0005/sdk": "*"
+  },
+  "devDependencies": {
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4",
+    "@types/node": "^20.12.7"
+  }
+}

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LP-0005 Attestation</title>
+    <link rel="stylesheet" href="src/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Private balance attestation</h1>
+        <p class="muted">
+          LP-0005 for the Logos Execution Zone. Prove a private LEZ
+          token account holds <code>balance &gt;= N</code> without
+          revealing the balance, the account, or the nullifier key.
+          Verify on-chain through a SPEL program or off-chain over
+          Logos Messaging.
+        </p>
+        <p class="muted intro-extra">
+          This page runs the public-side checks — gate-id derivation,
+          journal-field inspection, field-equality verification —
+          entirely in your browser. Cryptographic receipt verification
+          and ed25519 signature checks need the CLI:
+          <code>cargo install attestation-cli</code> from the
+          <a href="/repo">repo</a>.
+        </p>
+      </header>
+
+      <section>
+        <h2>1. Pick a gate</h2>
+        <p class="muted small">
+          The gate's <code>context_id</code> is a domain-separated hash
+          of the gate's identifying inputs. The prover commits it to
+          the journal; the verifier rejects any proof whose
+          <code>context_id</code> doesn't match. Trailing colons on
+          every domain prefix prevent cross-domain collisions.
+        </p>
+        <div class="grid">
+          <label>
+            <span>Domain</span>
+            <select id="domain">
+              <option value="program">on-chain program</option>
+              <option value="chat">chat group</option>
+              <option value="fee">fee tier</option>
+              <option value="generic">generic integration</option>
+            </select>
+          </label>
+          <label data-domain="program chat fee">
+            <span id="key-label">Program pubkey</span>
+            <input id="key" type="text" placeholder="0x…" maxlength="66" />
+          </label>
+          <label data-domain="program">
+            <span>Gate seed</span>
+            <input id="seed" type="text" placeholder="0x…" maxlength="66" />
+          </label>
+          <label data-domain="chat">
+            <span>Epoch</span>
+            <input id="epoch" type="number" min="0" value="1" />
+          </label>
+          <label data-domain="fee">
+            <span>Tier</span>
+            <input id="tier" type="number" min="0" value="1" />
+          </label>
+          <label data-domain="generic">
+            <span>Integration id</span>
+            <input id="integration" type="text" placeholder="acme-allowlist-v1" />
+          </label>
+        </div>
+        <p>
+          <strong>Context id:</strong>
+          <code id="context-id">—</code>
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Inspect a journal</h2>
+        <p class="muted small">
+          The journal is the proof's public output:
+          <code>merkle_root, threshold, context_id, presenter_pk,
+          program_owner, circuit_version</code>. Everything else from
+          the witness — balance, npk, nonce, data — never reaches the
+          verifier. Pick a mode below.
+        </p>
+        <div class="tabs">
+          <button class="tab tab-active" data-tab="manual" type="button">Build manually</button>
+          <button class="tab" data-tab="upload" type="button">Upload receipt</button>
+          <button id="sample-btn" class="tab tab-secondary" type="button" title="Populate fields with a sample journal">Load sample</button>
+        </div>
+
+        <div id="tab-manual" class="tab-panel tab-panel-active">
+          <div class="grid">
+            <label class="full">
+              <span>merkle_root (32 bytes hex)</span>
+              <input id="m-root" type="text" placeholder="0x…" maxlength="66" />
+            </label>
+            <label>
+              <span>threshold (u64)</span>
+              <input id="m-threshold" type="number" min="0" value="100" />
+            </label>
+            <label>
+              <span>circuit_version (u32)</span>
+              <input id="m-version" type="number" min="1" value="2" />
+            </label>
+            <label class="full">
+              <span>context_id (32 bytes hex)</span>
+              <input id="m-context" type="text" placeholder="0x…" maxlength="66" />
+            </label>
+            <label class="full">
+              <span>presenter_pk (32 bytes hex)</span>
+              <input id="m-presenter" type="text" placeholder="0x…" maxlength="66" />
+            </label>
+            <label class="full">
+              <span>program_owner (32 bytes hex)</span>
+              <input id="m-owner" type="text" placeholder="0x…" maxlength="66" />
+            </label>
+          </div>
+        </div>
+
+        <div id="tab-upload" class="tab-panel">
+          <input id="receipt-file" type="file" accept=".bin,.receipt" />
+          <p class="muted small">
+            Receipts come out of <code>attestation-cli prove --out
+            ./out/proof.bin</code>. The parser scans the file for a
+            140-byte JournalFields-shaped section.
+          </p>
+        </div>
+
+        <pre id="journal-view" class="placeholder">No journal loaded.</pre>
+      </section>
+
+      <section>
+        <h2>3. Sign a challenge as the presenter</h2>
+        <p class="muted small">
+          Presenter binding (the bounty's "Known Open Problem"). The
+          verifier issues a fresh 32-byte challenge; the presenter
+          signs it with the secret key whose public half is embedded
+          in the account's <code>data</code> field and committed as
+          <code>presenter_pk</code>. A forwarded proof without the
+          spending key cannot pass this step.
+        </p>
+        <div class="grid">
+          <label class="full">
+            <span>Presenter keypair (ed25519)</span>
+            <div class="row-actions">
+              <button id="kp-gen" type="button" class="tab tab-secondary">Generate fresh</button>
+              <button id="kp-sample" type="button" class="tab tab-secondary">Use sample seed</button>
+            </div>
+          </label>
+          <label class="full">
+            <span>Public key (32 bytes hex)</span>
+            <input id="kp-public" type="text" placeholder="0x…" maxlength="66" readonly />
+          </label>
+          <label class="full">
+            <span>Secret seed (32 bytes hex) — DO NOT use a real key here</span>
+            <input id="kp-secret" type="text" placeholder="0x…" maxlength="66" />
+          </label>
+          <label class="full">
+            <span>Challenge (32 bytes hex — issued by the verifier)</span>
+            <input id="kp-challenge" type="text" placeholder="0x…" maxlength="66" />
+          </label>
+          <label class="full">
+            <span>Signature (64 bytes hex — auto-filled after sign)</span>
+            <textarea id="kp-signature" rows="2" placeholder="0x…"></textarea>
+          </label>
+        </div>
+        <div class="row-actions">
+          <button id="kp-sign" type="button">Sign challenge</button>
+          <button id="kp-use" type="button" class="tab tab-secondary" title="Copy this pubkey into the journal's presenter_pk field">Use as presenter_pk →</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>4. Verify against a gate</h2>
+        <p class="muted small">
+          Field-equality checks (<code>context_id</code>,
+          <code>threshold</code>, <code>merkle_root</code>,
+          <code>circuit_version</code>) plus the ed25519 signature
+          check from step 3. The only piece left for the CLI is the
+          RISC0 receipt cryptographic check — the output shows the
+          exact command for that.
+        </p>
+        <label>
+          <span>Trusted roots (hex, one per line — optional)</span>
+          <textarea id="trusted-roots" rows="3" placeholder="0x…"></textarea>
+        </label>
+        <label>
+          <span>Minimum threshold</span>
+          <input id="min-threshold" type="number" min="0" value="0" />
+        </label>
+        <button id="verify-btn" type="button">Run public-side verifier</button>
+        <pre id="verify-result" class="placeholder">Not run.</pre>
+      </section>
+
+      <footer>
+        <p class="muted">
+          v0.1.0 · MIT or Apache-2.0 · <a href="/repo">repo</a> ·
+          <a href="/bounty">bounty spec</a>
+        </p>
+      </footer>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

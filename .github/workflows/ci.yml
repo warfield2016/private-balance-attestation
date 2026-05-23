@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUSTFLAGS: -D warnings
+  RISC0_VERSION: "3.0.5"
+  LEZ_REF: "v0.2.0-rc3"
+
+jobs:
+  rust-fmt-clippy-test:
+    name: Rust — fmt + clippy + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format check
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        # The guest crate is skipped at the workspace boundary
+        # (exclude in Cargo.toml). The remaining crates compile
+        # host-side without the riscv toolchain.
+        run: |
+          cargo clippy \
+            -p attestation_core \
+            -p attestation_verifier \
+            -p attestation_program \
+            --all-targets -- -D warnings
+      - name: Unit tests
+        run: |
+          cargo test \
+            -p attestation_core \
+            -p attestation_verifier \
+            -p attestation_program
+
+  typescript-build:
+    name: TypeScript — build + typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --workspaces --include-workspace-root
+      - run: npm -w @lp-0005/sdk run typecheck
+      - run: npm -w @lp-0005/sdk run build
+      - run: npm -w @lp-0005/example-chat-gate run typecheck
+      - run: npm -w @lp-0005/example-fee-tier-gate run typecheck
+
+  idl-gen:
+    name: IDL — generate from #[lez_program] macros
+    runs-on: ubuntu-latest
+    needs: [rust-fmt-clippy-test, typescript-build]
+    # Mirrors lez-multisig's CI pattern: skip the actual riscv32
+    # guest build (RISC0_SKIP_BUILD=1) and verify the macro-driven
+    # IDL generator runs. The guest binary itself is built locally
+    # with the full RISC0 toolchain via `make build`.
+    env:
+      RISC0_SKIP_BUILD: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install spel-client-gen
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cargo install \
+            --git https://github.com/logos-co/spel.git \
+            --tag "v0.3.0" \
+            spel-client-gen \
+            --locked || true
+      - name: Generate IDL
+        run: |
+          cargo run -p attestation-idl-gen > attestation-idl.json
+          test -s attestation-idl.json
+      - name: Upload IDL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: attestation-idl
+          path: attestation-idl.json

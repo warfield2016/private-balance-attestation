@@ -1,0 +1,19 @@
+# SPEL CLI config for this project. `spel inspect`, `spel pda`, and the
+# IDL-driven CLI commands read these defaults.
+
+[program]
+name = "attestation_program"
+idl  = "attestation-idl.json"
+# Path to the compiled guest ELF used to derive the on-chain program id.
+binary = "methods/guest/target/riscv32im-risc0-zkvm-elf/docker/attestation.bin"
+
+[wallet]
+# The wallet directory is created by `logos-scaffold setup` and is left
+# out of git. Set the env var below before running commands that talk
+# to the local sequencer.
+#
+# export NSSA_WALLET_HOME_DIR="$PWD/.scaffold/wallet"
+
+[network]
+# Local sequencer started by `logos-scaffold localnet start`.
+rpc = "http://127.0.0.1:3040"

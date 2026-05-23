@@ -1,0 +1,21 @@
+[package]
+name = "attestation_verifier"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "LP-0005 attestation verifier. Pure verification logic shared by the on-chain LEZ program and off-chain clients."
+
+[features]
+default = ["std"]
+std = ["attestation_core/std", "ed25519-dalek/std", "borsh/std"]
+
+[dependencies]
+risc0-zkvm = { workspace = true, default-features = false, features = ["std"] }
+attestation_core = { workspace = true }
+borsh = { workspace = true, default-features = false, features = ["derive"] }
+serde = { workspace = true, default-features = false, features = ["derive"] }
+bincode = { workspace = true }
+ed25519-dalek = { workspace = true, default-features = false }
+thiserror = { workspace = true }
+hex = { workspace = true, default-features = false, features = ["alloc"] }

@@ -1,0 +1,20 @@
+[package]
+name = "attestation_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "LP-0005 shared primitives: commitment format, Merkle path, context-id, journal layout. no_std so the RISC0 guest can use it."
+
+[features]
+default = ["std"]
+std = ["sha2/std", "serde/std", "borsh/std", "hex/std"]
+
+[dependencies]
+sha2 = { workspace = true }
+serde = { workspace = true }
+borsh = { workspace = true }
+hex = { workspace = true }
+
+[dev-dependencies]
+hex-literal = "0.4"

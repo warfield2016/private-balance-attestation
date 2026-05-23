@@ -1,0 +1,29 @@
+{
+  "name": "lp-0005-balance-attestation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Top-level workspace for LP-0005 Private Token Balance Attestation: RISC0 circuit, LEZ verifier program, off-chain verifier, and TypeScript SDK.",
+  "license": "(MIT OR Apache-2.0)",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "workspaces": [
+    "ts",
+    "examples/governance-gate",
+    "examples/chat-gate",
+    "examples/fee-tier-gate"
+  ],
+  "scripts": {
+    "build": "npm -w @lp-0005/sdk run build",
+    "test": "npm -w @lp-0005/sdk run test",
+    "demo": "bash scripts/demo.sh",
+    "benchmark": "bash scripts/benchmark.sh",
+    "build:rust": "cargo build --workspace --release",
+    "test:rust": "cargo test --workspace",
+    "lint:rust": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings",
+    "typecheck": "npm -w @lp-0005/sdk run typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

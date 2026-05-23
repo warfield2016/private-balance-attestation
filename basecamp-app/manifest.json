@@ -1,0 +1,19 @@
+{
+  "name": "LP-0005 Attestation",
+  "id": "lp-0005-attestation",
+  "version": "0.1.0",
+  "description": "Generate and inspect private balance attestations for LEZ.",
+  "author": "warfield2016",
+  "entry": "index.html",
+  "permissions": [
+    "logos.wallet.read",
+    "logos.messaging.send",
+    "logos.messaging.recv",
+    "logos.lez.rpc"
+  ],
+  "categories": ["privacy", "developer-tools"],
+  "icons": {
+    "32": "assets/icon-32.png",
+    "128": "assets/icon-128.png"
+  }
+}

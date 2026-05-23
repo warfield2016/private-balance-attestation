@@ -1,0 +1,13 @@
+[package]
+name = "governance-gate-example"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+attestation_core = { path = "../../../attestation_core" }
+attestation_program = { path = "../../../attestation_program" }
+borsh = { version = "1.5", features = ["derive", "std"] }

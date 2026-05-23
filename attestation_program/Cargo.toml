@@ -1,0 +1,18 @@
+[package]
+name = "attestation_program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "LP-0005 on-chain LEZ verifier program. Uses spel-framework's #[lez_program] macro to declare handlers."
+
+[dependencies]
+# Pure-Rust types only. No risc0-zkvm host deps — those would pull
+# ring through `nssa`'s wallet path and break the riscv32 guest build.
+attestation_core = { workspace = true }
+nssa_core = { workspace = true }
+spel-framework = { workspace = true }
+borsh = { workspace = true, default-features = false, features = ["derive"] }
+serde = { workspace = true, default-features = false, features = ["derive"] }
+ed25519-dalek = { workspace = true, default-features = false }
+thiserror = { workspace = true }

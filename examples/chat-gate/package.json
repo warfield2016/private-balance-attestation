@@ -1,0 +1,21 @@
+{
+  "name": "@lp-0005/example-chat-gate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Off-chain chat-group admission example for LP-0005.",
+  "license": "(MIT OR Apache-2.0)",
+  "type": "module",
+  "scripts": {
+    "demo": "node --import tsx ./src/demo.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lp-0005/sdk": "*",
+    "@noble/ed25519": "^2.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4",
+    "@types/node": "^20.12.7"
+  }
+}

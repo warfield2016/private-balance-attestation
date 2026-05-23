@@ -1,0 +1,25 @@
+[package]
+name = "attestation_e2e_tests"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# Tests live in tests/ — no library binary. The crate exists so the
+# workspace's `cargo check` sees the e2e harness as a first-class
+# member, and so a future `make e2e` can `cargo test --test=*`
+# against a live sequencer.
+
+[dev-dependencies]
+attestation_core = { workspace = true }
+attestation_host = { workspace = true }
+attestation_verifier = { workspace = true }
+attestation_program = { workspace = true }
+ed25519-dalek = { workspace = true, features = ["std", "rand_core"] }
+rand_core = { workspace = true, features = ["std"] }
+borsh = { workspace = true, features = ["std"] }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+hex = { workspace = true, features = ["std"] }
+
+[lib]
+path = "src/lib.rs"

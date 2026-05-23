@@ -1,0 +1,31 @@
+target/
+**/*.rs.bk
+**/Cargo.lock.bak
+node_modules/
+ts/dist/
+ts/*.tsbuildinfo
+*.log
+.DS_Store
+.env
+.env.local
+.idea/
+.vscode/
+!/.vscode/settings.recommended.json
+.risc0/
+risc0-cache/
+out/
+*.receipt
+*.bin
+artifacts/
+keys/*.json
+!keys/.gitkeep
+
+# logos-scaffold puts the local wallet + vendored LEZ here
+.scaffold/
+
+# Make state files (program ids, deploy receipts)
+.*-state
+
+# Generated IDL — emitted by `make idl` from the program source
+attestation-idl.json
+.vercel

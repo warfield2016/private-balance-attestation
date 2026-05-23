@@ -1,0 +1,12 @@
+[package]
+name = "attestation-idl-gen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "attestation-idl-gen"
+path = "src/main.rs"
+
+[dependencies]
+spel-framework = { workspace = true }
